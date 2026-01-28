@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class TankInputManager : MonoBehaviour
 {
@@ -7,6 +8,25 @@ public class TankInputManager : MonoBehaviour
     [SerializeField] private TurretSystem turretSystem;
     [SerializeField] private WeaponSystem weaponSystem;
 
+    // DEĞİŞİKLİK 1: Sınıf adı dosya adıyla aynı olmalı
+    private InputSystem_Actions _inputActions;
+
+    private void Awake()
+    {
+        // DEĞİŞİKLİK 2: Burada da doğrusunu kullanıyoruz
+        _inputActions = new InputSystem_Actions();
+    }
+
+    private void OnEnable()
+    {
+        _inputActions.Enable();
+    }
+
+    private void OnDisable()
+    {
+        _inputActions.Disable();
+    }
+
     private void Update()
     {
         HandleMovementInput();
@@ -14,42 +34,38 @@ public class TankInputManager : MonoBehaviour
         HandleShootingInput();
     }
 
-    // Methodları parçalayarak okunabilirliği artırdık (Clean Code)
-    
     private void HandleMovementInput()
     {
-        // Gövde İleri-Geri (W - S)
-        if (Input.GetKey(KeyCode.W))
-            tankMover.Move(1f);
-        else if (Input.GetKey(KeyCode.S))
-            tankMover.Move(-1f);
+        // ÖNEMLİ: InputSystem_Actions dosyasını açıp Action Map adının "Player"
+        // ve Action adının "Move" olduğundan emin olmalısın.
+        // Eğer dosya Unity'nin varsayılan dosyasıysa isimler genelde "Player", "Move", "Look", "Fire" olur.
+        
+        Vector2 moveVector = _inputActions.Player.TurretMove.ReadValue<Vector2>();
 
-        // Gövde Dönüş (A - D)
-        if (Input.GetKey(KeyCode.D))
-            tankMover.Rotate(1f);
-        else if (Input.GetKey(KeyCode.A))
-            tankMover.Rotate(-1f);
+        tankMover.Move(moveVector.y);
+        tankMover.Rotate(moveVector.x);
     }
 
     private void HandleTurretInput()
     {
-        // Kule Dönüş (Sağ Ok - Sol Ok)
-        if (Input.GetKey(KeyCode.RightArrow))
-            turretSystem.RotateTurret(1f);
-        else if (Input.GetKey(KeyCode.LeftArrow))
-            turretSystem.RotateTurret(-1f);
+        // "TurretMove" action'ını senin eklediğini varsayıyorum.
+        // Eğer eklemediysen hata verir. InputSystem_Actions dosyasına çift tıklayıp
+        // "Player" altına "TurretMove" (Ok tuşları) eklemeyi unutma.
+        
+        // Hata almamak için şimdilik varsayılan "Look" action'ını da kullanabilirsin test için:
+        // Vector2 turretVector = _inputActions.Player.Look.ReadValue<Vector2>();
+        
+        Vector2 turretVector = _inputActions.Player.TurretMove.ReadValue<Vector2>();
 
-        // Namlu Eğim (Yukarı Ok - Aşağı Ok)
-        // Yukarı basınca eksiye (yukarı) gitmesi için -1 ile çarptık
-        if (Input.GetKey(KeyCode.UpArrow))
-            turretSystem.TiltCannon(-1f); 
-        else if (Input.GetKey(KeyCode.DownArrow))
-            turretSystem.TiltCannon(1f);
+        turretSystem.RotateTurret(turretVector.x);
+        turretSystem.TiltCannon(-turretVector.y);
     }
 
     private void HandleShootingInput()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Unity varsayılan dosyasında "Fire" yerine "Attack" olabilir, kontrol et.
+        // Genelde "Fire" veya "Attack" olur.
+        if (_inputActions.Player.Fire.WasPressedThisFrame())
         {
             weaponSystem.Fire();
         }
