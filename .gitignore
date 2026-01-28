@@ -6,15 +6,19 @@
 [Bb]uilds/
 [Ll]ogs/
 [Mm]emoryCaptures/
+UserSettings/
+UnityCache/
 
 # Asset meta data should only be ignored when the corresponding asset is ignored
 !/[Aa]ssets/**/*.meta
 
-# Visual Studio / Rider
+# Visual Studio / Rider / VS Code
 .vs/
 .idea/
+.vscode/
 *.csproj
 *.sln
+*.slnx
 *.user
 *.suo
 
