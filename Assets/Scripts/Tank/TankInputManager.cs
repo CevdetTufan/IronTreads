@@ -40,7 +40,7 @@ public class TankInputManager : MonoBehaviour
         // ve Action adının "Move" olduğundan emin olmalısın.
         // Eğer dosya Unity'nin varsayılan dosyasıysa isimler genelde "Player", "Move", "Look", "Fire" olur.
         
-        Vector2 moveVector = _inputActions.Player.TurretMove.ReadValue<Vector2>();
+        Vector2 moveVector = _inputActions.Player.Move.ReadValue<Vector2>();
 
         tankMover.Move(moveVector.y);
         tankMover.Rotate(moveVector.x);
